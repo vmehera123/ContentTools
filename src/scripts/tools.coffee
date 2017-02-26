@@ -1262,6 +1262,96 @@ class ContentTools.Tools.Video extends ContentTools.Tool
         modal.show()
         dialog.show()
 
+class ContentTools.Tools.Embed extends ContentTools.Tool
+
+    # Insert an embed.
+
+    ContentTools.ToolShelf.stow(@, 'embed')
+
+    @label = 'Player'
+    @icon = 'music'
+
+    @canApply: (element, selection) ->
+    # Return true if the tool can be applied to the current
+    # element/selection.
+        return not element.isFixed()
+
+    @apply: (element, selection, callback) ->
+
+        # Dispatch `apply` event
+        toolDetail = {
+            'tool': this,
+            'element': element,
+            'selection': selection
+        }
+        if not @dispatchEditorEvent('tool-apply', toolDetail)
+            return
+
+        # If supported allow store the state for restoring once the dialog is
+        # cancelled.
+        if element.storeState
+            element.storeState()
+
+        # Set-up the dialog
+        app = ContentTools.EditorApp.get()
+
+        # Modal
+        modal = new ContentTools.ModalUI()
+
+        # Dialog
+        dialog = new ContentTools.EmbedDialog()
+
+        # Support cancelling the dialog
+        dialog.addEventListener 'cancel', () =>
+
+            modal.hide()
+            dialog.hide()
+
+            if element.restoreState
+                element.restoreState()
+
+            callback(false)
+
+        # Support saving the dialog
+        dialog.addEventListener 'save', (ev) =>
+            tag = ev.detail().tag
+            attrs = {}
+            for own key, value of tag.attributes
+                attrs[value.name] = value.value
+
+            if tag
+            # Cr1eate the new embed
+                embed = new ContentEdit.Video('iframe', attrs)
+
+                # Find insert position
+                [node, index] = @_insertAt(element)
+                node.parent().attach(embed, index)
+
+                # Focus the new player
+                embed.focus()
+
+            else
+            # Nothing to do restore state
+                if element.restoreState
+                    element.restoreState()
+
+            modal.hide()
+            dialog.hide()
+
+            applied = tag != ''
+            callback(applied)
+
+            # Dispatch `applied` event
+            if applied
+                @dispatchEditorEvent('tool-applied', toolDetail)
+
+        # Show the dialog
+        app.attach(modal)
+        app.attach(dialog)
+        modal.show()
+        dialog.show()
+
+
 
 class ContentTools.Tools.Undo extends ContentTools.Tool
 

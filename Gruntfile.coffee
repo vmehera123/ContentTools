@@ -27,6 +27,7 @@ module.exports = (grunt) ->
 
                         # UI - Dialogs
                         'src/scripts/ui/dialogs/dialogs.coffee'
+                        'src/scripts/ui/dialogs/embed.coffee'
                         'src/scripts/ui/dialogs/image.coffee'
                         'src/scripts/ui/dialogs/link.coffee'
                         'src/scripts/ui/dialogs/properties.coffee'
@@ -64,6 +65,7 @@ module.exports = (grunt) ->
 
                         # UI - Dialogs
                         'src/spec/ui/dialogs/dialogs.coffee'
+                        'src/scripts/ui/dialogs/embed.coffee'
                         'src/spec/ui/dialogs/image.coffee'
                         'src/spec/ui/dialogs/link.coffee'
                         'src/spec/ui/dialogs/properties.coffee'

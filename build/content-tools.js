@@ -6811,6 +6811,114 @@
 
   })(ContentTools.WidgetUI);
 
+  ContentTools.EmbedDialog = (function(_super) {
+    __extends(EmbedDialog, _super);
+
+    function EmbedDialog() {
+      EmbedDialog.__super__.constructor.call(this, 'Вставить плеер');
+    }
+
+    EmbedDialog.prototype.clearPreview = function() {
+      if (this._domPreview) {
+        this._domPreview.parentNode.removeChild(this._domPreview);
+        return this._domPreview = void 0;
+      }
+    };
+
+    EmbedDialog.prototype.mount = function() {
+      var domControlGroup;
+      EmbedDialog.__super__.mount.call(this);
+      ContentEdit.addCSSClass(this._domElement, 'ct-music-dialog');
+      ContentEdit.addCSSClass(this._domView, 'ct-music-dialog__preview');
+      domControlGroup = this.constructor.createDiv(['ct-control-group']);
+      this._domControls.appendChild(domControlGroup);
+      this._domInput = document.createElement('input');
+      this._domInput.setAttribute('class', 'ct-video-dialog__input');
+      this._domInput.setAttribute('name', 'url');
+      this._domInput.setAttribute('placeholder', ContentEdit._('Код плеера') + '...');
+      this._domInput.setAttribute('type', 'text');
+      domControlGroup.appendChild(this._domInput);
+      this._domButton = this.constructor.createDiv(['ct-control', 'ct-control--text', 'ct-control--insert', 'ct-control--muted']);
+      this._domButton.textContent = ContentEdit._('Вставить');
+      domControlGroup.appendChild(this._domButton);
+      return this._addDOMEventListeners();
+    };
+
+    EmbedDialog.prototype.preview = function(iframe) {
+      this.clearPreview();
+      this._domPreview = document.createRange().createContextualFragment(iframe).firstChild;
+      return this._domView.appendChild(this._domPreview);
+    };
+
+    EmbedDialog.prototype.save = function() {
+      return this.dispatchEvent(this.createEvent('save', {
+        'tag': this._domPreview
+      }));
+    };
+
+    EmbedDialog.prototype.show = function() {
+      EmbedDialog.__super__.show.call(this);
+      return this._domInput.focus();
+    };
+
+    EmbedDialog.prototype.unmount = function() {
+      if (this.isMounted()) {
+        this._domInput.blur();
+      }
+      EmbedDialog.__super__.unmount.call(this);
+      this._domButton = null;
+      this._domInput = null;
+      return this._domPreview = null;
+    };
+
+    EmbedDialog.prototype._addDOMEventListeners = function() {
+      EmbedDialog.__super__._addDOMEventListeners.call(this);
+      this._domInput.addEventListener('input', (function(_this) {
+        return function(ev) {
+          var updatePreview;
+          if (ev.target.value) {
+            ContentEdit.removeCSSClass(_this._domButton, 'ct-control--muted');
+          } else {
+            ContentEdit.addCSSClass(_this._domButton, 'ct-control--muted');
+          }
+          if (_this._updatePreviewTimeout) {
+            clearTimeout(_this._updatePreviewTimeout);
+          }
+          updatePreview = function() {
+            var code;
+            code = _this._domInput.value.trim();
+            if (code) {
+              return _this.preview(code);
+            } else {
+              return _this.clearPreview();
+            }
+          };
+          return _this._updatePreviewTimeout = setTimeout(updatePreview, 500);
+        };
+      })(this));
+      this._domInput.addEventListener('keypress', (function(_this) {
+        return function(ev) {
+          if (ev.keyCode === 13) {
+            return _this.save();
+          }
+        };
+      })(this));
+      return this._domButton.addEventListener('click', (function(_this) {
+        return function(ev) {
+          var cssClass;
+          ev.preventDefault();
+          cssClass = _this._domButton.getAttribute('class');
+          if (cssClass.indexOf('ct-control--muted') === -1) {
+            return _this.save();
+          }
+        };
+      })(this));
+    };
+
+    return EmbedDialog;
+
+  })(ContentTools.DialogUI);
+
   ContentTools.ImageDialog = (function(_super) {
     __extends(ImageDialog, _super);
 
@@ -7898,7 +8006,7 @@
     __extends(VideoDialog, _super);
 
     function VideoDialog() {
-      VideoDialog.__super__.constructor.call(this, 'Insert video');
+      VideoDialog.__super__.constructor.call(this, 'Вставить видео');
     }
 
     VideoDialog.prototype.clearPreview = function() {
@@ -7918,11 +8026,11 @@
       this._domInput = document.createElement('input');
       this._domInput.setAttribute('class', 'ct-video-dialog__input');
       this._domInput.setAttribute('name', 'url');
-      this._domInput.setAttribute('placeholder', ContentEdit._('Paste YouTube or Vimeo URL') + '...');
+      this._domInput.setAttribute('placeholder', ContentEdit._('Ссылка на YouTube или Vimeo') + '...');
       this._domInput.setAttribute('type', 'text');
       domControlGroup.appendChild(this._domInput);
       this._domButton = this.constructor.createDiv(['ct-control', 'ct-control--text', 'ct-control--insert', 'ct-control--muted']);
-      this._domButton.textContent = ContentEdit._('Insert');
+      this._domButton.textContent = ContentEdit._('Вставить');
       domControlGroup.appendChild(this._domButton);
       return this._addDOMEventListeners();
     };
@@ -7934,6 +8042,12 @@
       this._domPreview.setAttribute('height', '100%');
       this._domPreview.setAttribute('src', url);
       this._domPreview.setAttribute('width', '100%');
+      return this._domView.appendChild(this._domPreview);
+    };
+
+    VideoDialog.prototype.iframePreview = function(iframe) {
+      this.clearPreview();
+      this._domPreview = document.createRange().createContextualFragment(iframe).firstChild;
       return this._domView.appendChild(this._domPreview);
     };
 
@@ -7986,6 +8100,8 @@
             embedURL = ContentTools.getEmbedVideoURL(videoURL);
             if (embedURL) {
               return _this.preview(embedURL);
+            } else if (videoURL.match(/iframe/ig)) {
+              return _this.iframePreview(videoURL);
             } else {
               return _this.clearPreview();
             }
@@ -10084,6 +10200,89 @@
     };
 
     return Video;
+
+  })(ContentTools.Tool);
+
+  ContentTools.Tools.Embed = (function(_super) {
+    __extends(Embed, _super);
+
+    function Embed() {
+      return Embed.__super__.constructor.apply(this, arguments);
+    }
+
+    ContentTools.ToolShelf.stow(Embed, 'embed');
+
+    Embed.label = 'Player';
+
+    Embed.icon = 'music';
+
+    Embed.canApply = function(element, selection) {
+      return !element.isFixed();
+    };
+
+    Embed.apply = function(element, selection, callback) {
+      var app, dialog, modal, toolDetail;
+      toolDetail = {
+        'tool': this,
+        'element': element,
+        'selection': selection
+      };
+      if (!this.dispatchEditorEvent('tool-apply', toolDetail)) {
+        return;
+      }
+      if (element.storeState) {
+        element.storeState();
+      }
+      app = ContentTools.EditorApp.get();
+      modal = new ContentTools.ModalUI();
+      dialog = new ContentTools.EmbedDialog();
+      dialog.addEventListener('cancel', (function(_this) {
+        return function() {
+          modal.hide();
+          dialog.hide();
+          if (element.restoreState) {
+            element.restoreState();
+          }
+          return callback(false);
+        };
+      })(this));
+      dialog.addEventListener('save', (function(_this) {
+        return function(ev) {
+          var applied, attrs, embed, index, key, node, tag, value, _ref, _ref1;
+          tag = ev.detail().tag;
+          attrs = {};
+          _ref = tag.attributes;
+          for (key in _ref) {
+            if (!__hasProp.call(_ref, key)) continue;
+            value = _ref[key];
+            attrs[value.name] = value.value;
+          }
+          if (tag) {
+            embed = new ContentEdit.Video('iframe', attrs);
+            _ref1 = _this._insertAt(element), node = _ref1[0], index = _ref1[1];
+            node.parent().attach(embed, index);
+            embed.focus();
+          } else {
+            if (element.restoreState) {
+              element.restoreState();
+            }
+          }
+          modal.hide();
+          dialog.hide();
+          applied = tag !== '';
+          callback(applied);
+          if (applied) {
+            return _this.dispatchEditorEvent('tool-applied', toolDetail);
+          }
+        };
+      })(this));
+      app.attach(modal);
+      app.attach(dialog);
+      modal.show();
+      return dialog.show();
+    };
+
+    return Embed;
 
   })(ContentTools.Tool);
 

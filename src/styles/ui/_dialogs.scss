@@ -46,6 +46,11 @@
         width: $dialogWidth;
         z-index: $base-z-index + 100;
 
+        &.ct-music-dialog {
+            height: 380px;
+            margin-top: -190px;
+        }
+
         /**
          * The `busy` modifier maybe programatically applied to a dialog to
          * prevent any further interaction with the dialog until a task has been
@@ -565,6 +570,45 @@
         }
     }
 
+
+    /**
+     * The music dialog supports the insertion of embedded players
+     */
+    .ct-music-dialog {
+
+        &__preview {
+            height: 200px;
+
+            &:empty {
+                background: #eee;
+                @include type-icons($font-size: 80px);
+                line-height: 200px;
+                text-align: center;
+
+                &:before {
+                    color: white;
+                    content: '\e911';
+                }
+            }
+
+        }
+
+        &__input {
+            border: none;
+            border-bottom: 1px solid #eee;
+            height: 32px;
+            line-height: 32px;
+            outline: none;
+            padding: 0 4px;
+            @include type-text;
+            vertical-align: top;
+            width: 456px;
+
+            &:focus {
+                border-bottom: 1px solid darken(#eee, 5%);
+            }
+        }
+    }
 
     /**
      * Anchored dialogs are a special type of dialog that are appear at a fixed

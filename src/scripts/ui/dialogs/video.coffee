@@ -3,7 +3,7 @@ class ContentTools.VideoDialog extends ContentTools.DialogUI
     # A dialog to support inserting a video
 
     constructor: ()->
-        super('Insert video')
+        super('Вставить видео')
 
     clearPreview: () ->
         # Clear the current video preview
@@ -31,7 +31,7 @@ class ContentTools.VideoDialog extends ContentTools.DialogUI
         @_domInput.setAttribute('name', 'url')
         @_domInput.setAttribute(
             'placeholder',
-            ContentEdit._('Paste YouTube or Vimeo URL') + '...'
+            ContentEdit._('Ссылка на YouTube или Vimeo') + '...'
             )
         @_domInput.setAttribute('type', 'text')
         domControlGroup.appendChild(@_domInput)
@@ -43,7 +43,7 @@ class ContentTools.VideoDialog extends ContentTools.DialogUI
             'ct-control--insert'
             'ct-control--muted'
             ])
-        @_domButton.textContent = ContentEdit._('Insert')
+        @_domButton.textContent = ContentEdit._('Вставить')
         domControlGroup.appendChild(@_domButton)
 
         # Add interaction handlers
@@ -61,6 +61,15 @@ class ContentTools.VideoDialog extends ContentTools.DialogUI
         @_domPreview.setAttribute('height', '100%')
         @_domPreview.setAttribute('src', url)
         @_domPreview.setAttribute('width', '100%')
+        @_domView.appendChild(@_domPreview)
+
+    iframePreview: (iframe) ->
+        # Preview the specified iframe
+
+        # Remove any existing preview
+        @clearPreview()
+
+        @_domPreview = document.createRange().createContextualFragment(iframe).firstChild
         @_domView.appendChild(@_domPreview)
 
     save: () ->
@@ -111,7 +120,7 @@ class ContentTools.VideoDialog extends ContentTools.DialogUI
             # If the input field is empty we disable the insert button
            if ev.target.value
                 ContentEdit.removeCSSClass(@_domButton, 'ct-control--muted')
-            else
+           else
                 ContentEdit.addCSSClass(@_domButton, 'ct-control--muted')
 
             # We give the user half a second to make additional changes before
@@ -127,6 +136,8 @@ class ContentTools.VideoDialog extends ContentTools.DialogUI
                 embedURL = ContentTools.getEmbedVideoURL(videoURL)
                 if embedURL
                     @preview(embedURL)
+                else if videoURL.match(/iframe/ig)
+                    @iframePreview(videoURL)
                 else
                     @clearPreview()
 
