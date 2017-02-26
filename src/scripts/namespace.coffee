@@ -37,7 +37,8 @@ ContentTools =
         ], [
             'undo',
             'redo',
-            'remove'
+            'remove',
+            'embed'
         ]
     ]
 
