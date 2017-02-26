@@ -13,7 +13,6 @@ class ContentTools.EmbedDialog extends ContentTools.DialogUI
 
   mount: () ->
     # Mount the widget
-    # TODO: create and add classes to dialog
 
     super()
 
