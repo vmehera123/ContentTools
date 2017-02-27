@@ -109,7 +109,7 @@ module.exports = (grunt) ->
 
             build:
                 src: 'build/content-tools.js'
-                dest: 'build/content-tools.min.js'
+                dest: '../uss/backend/assets/js/content-tools.min.js'
 
         concat:
             build:

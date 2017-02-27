@@ -127,6 +127,8 @@ $highlight-color: #f39c12 !default;
      * we display a video icon in the background and use the after element to
      * display information about the video's source.
      */
+
+    //TODO: image prefix for embed player
     &--type-video {
         background:
             #333

@@ -1319,6 +1319,8 @@ class ContentTools.Tools.Embed extends ContentTools.Tool
             for own key, value of tag.attributes
                 attrs[value.name] = value.value
 
+            attrs['data-ce-tag'] = 'iframe'
+
             if tag
             # Cr1eate the new embed
                 embed = new ContentEdit.Video('iframe', attrs)

@@ -3030,6 +3030,7 @@
         }
         element = cls.fromDOMElement(childNode);
         domElement.removeChild(childNode);
+
         if (element) {
           this.attach(element);
         }
@@ -4224,7 +4225,7 @@
         }
         return ("" + indent + "<video" + (this._attributesToString()) + ">" + le) + sourceStrings.join(le) + ("" + le + indent + "</video>");
       } else {
-        return ("" + indent + "<" + this._tagName + (this._attributesToString()) + ">") + ("</" + this._tagName + ">");
+        return ("" + indent + "<iframe " + (this._attributesToString()) + "></iframe>");
       }
     };
 
@@ -4238,12 +4239,16 @@
       }
       style = this._attributes['style'] ? this._attributes['style'] : '';
       if (this._attributes['width']) {
-        style += "width:" + this._attributes['width'] + "px;";
+        style += "width:" + this._attributes['width'] + ";";
       }
       if (this._attributes['height']) {
         style += "height:" + this._attributes['height'] + "px;";
       }
       this._domElement.setAttribute('style', style);
+      this._domElement.setAttribute('data-ce-tag', 'iframe');
+      //TODO: check if mount video el src is important
+      this._domElement.setAttribute('src', this.attr('src'));
+      this._domElement.setAttribute('frameborder', this.attr('frameborder') || 0);
       this._domElement.setAttribute('data-ce-title', this._title());
       return Video.__super__.mount.call(this);
     };
@@ -10257,6 +10262,7 @@
             value = _ref[key];
             attrs[value.name] = value.value;
           }
+          attrs['data-ce-tag'] = 'iframe';
           if (tag) {
             embed = new ContentEdit.Video('iframe', attrs);
             _ref1 = _this._insertAt(element), node = _ref1[0], index = _ref1[1];
