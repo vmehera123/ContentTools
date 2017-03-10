@@ -99,7 +99,7 @@ module.exports = (grunt) ->
 
             build:
                 files:
-                    'build/content-tools.min.css':
+                    '../uss/backend/assets/css/content-tools.min.css':
                         'build/content-tools.min.css'
 
         uglify:
