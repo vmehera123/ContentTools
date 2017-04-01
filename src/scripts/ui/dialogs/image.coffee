@@ -120,7 +120,8 @@ class ContentTools.ImageDialog extends ContentTools.DialogUI
         @_domCrop = @constructor.createDiv([
             'ct-control',
             'ct-control--icon',
-            'ct-control--crop'
+#            'ct-control--crop'
+#            TODO: resize window when image loaded, crop wrong coords
             ])
         @_domCrop.setAttribute('data-ct-tooltip', ContentEdit._('Crop marks'))
         domTools.appendChild(@_domCrop)

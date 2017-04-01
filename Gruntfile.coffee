@@ -133,7 +133,8 @@ module.exports = (grunt) ->
             build:
                 files: [
                     'src/scripts/**/*.coffee',
-                    'src/styles/**/*.scss'
+                    'src/styles/**/*.scss',
+                    'external/**/*.js'
                     ]
                 tasks: ['build']
 

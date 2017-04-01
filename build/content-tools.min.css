@@ -279,9 +279,7 @@
  */
 .ce-element--type-image,
 .ce-element--type-video {
-  display: block;
-  margin-left: auto;
-  margin-right: auto; }
+  display: block; }
   .ce-element--type-image.align-left,
   .ce-element--type-video.align-left {
     clear: initial;

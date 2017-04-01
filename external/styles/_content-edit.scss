@@ -381,8 +381,9 @@ $highlight-color: #f39c12 !default;
 .ce-element--type-image,
 .ce-element--type-video {
     display: block;
-    margin-left: auto;
-    margin-right: auto;
+    //fix image position on page was diff then in the editor
+    //margin-left: auto;
+    //margin-right: auto;
 
     &.align-left {
         clear: initial;

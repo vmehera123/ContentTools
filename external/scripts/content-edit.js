@@ -2852,8 +2852,8 @@
     ResizableElement.prototype.size = function(newSize) {
       var height, maxSize, minSize, width;
       if (!newSize) {
-        width = parseInt(this.attr('width') || 1);
-        height = parseInt(this.attr('height') || 1);
+        width = parseInt(this.attr('width') || ContentEdit.DEFAULT_MIN_ELEMENT_WIDTH);
+        height = parseInt(this.attr('height') || ContentEdit.DEFAULT_MIN_ELEMENT_WIDTH);
         return [width, height];
       }
       newSize[0] = parseInt(newSize[0]);
@@ -4045,10 +4045,22 @@
     };
 
     Image.prototype.html = function(indent) {
-      var attributes, img, le;
+      var attributes, img, le, style = '';
       if (indent == null) {
         indent = '';
       }
+      if (this._attributes['width']) {
+        style += "width:" + this._attributes['width'] + "px;";
+      }
+      if (this._attributes['height']) {
+        style += "height:" + this._attributes['height'] + "px;";
+      }
+      if (this._attributes['src']) {
+        style += "background-image: url(" + this._attributes['src'] + ");";
+      }
+      // recalculate style attr after resize el
+      this.attr('style', style);
+
       img = "" + indent + "<img" + (this._attributesToString()) + ">";
       if (this.a) {
         le = ContentEdit.LINE_ENDINGS;
@@ -4080,6 +4092,10 @@
         style += "height:" + this._attributes['height'] + "px;";
       }
       this._domElement.setAttribute('style', style);
+      this._domElement.setAttribute('src', this._attributes['src']);
+      this._domElement.setAttribute('width', this._attributes['width']);
+      this._domElement.setAttribute('height', this._attributes['height']);
+      this._domElement.setAttribute('data-ce-tag', 'img');
       return Image.__super__.mount.call(this);
     };
 
@@ -4210,7 +4226,7 @@
     };
 
     Video.prototype.html = function(indent) {
-      var attributes, le, source, sourceStrings, _i, _len, _ref;
+      var attributes, le, source, sourceStrings, _i, _len, _ref, style = '';
       if (indent == null) {
         indent = '';
       }
@@ -4225,6 +4241,15 @@
         }
         return ("" + indent + "<video" + (this._attributesToString()) + ">" + le) + sourceStrings.join(le) + ("" + le + indent + "</video>");
       } else {
+        if (this._attributes['width']) {
+          style += "width:" + this._attributes['width'] + "px;";
+        }
+        if (this._attributes['height']) {
+          style += "height:" + this._attributes['height'] + "px;";
+        }
+        // recalculate style attr after resize el
+        this.attr('style', style);
+
         return ("" + indent + "<iframe " + (this._attributesToString()) + "></iframe>");
       }
     };
@@ -4237,15 +4262,18 @@
       } else if (this._attributes['class']) {
         this._domElement.setAttribute('class', this._attributes['class']);
       }
-      style = this._attributes['style'] ? this._attributes['style'] : '';
+      style = /*this._attributes['style'] ? this._attributes['style'] : */'';
+
       if (this._attributes['width']) {
-        style += "width:" + this._attributes['width'] + ";";
+        style += "width:" + this._attributes['width'] + "px;";
       }
       if (this._attributes['height']) {
         style += "height:" + this._attributes['height'] + "px;";
       }
       this._domElement.setAttribute('style', style);
       this._domElement.setAttribute('data-ce-tag', 'iframe');
+      this._domElement.setAttribute('width', this._attributes['width']);
+      this._domElement.setAttribute('height', this._attributes['height']);
       //TODO: check if mount video el src is important
       this._domElement.setAttribute('src', this.attr('src'));
       this._domElement.setAttribute('frameborder', this.attr('frameborder') || 0);
